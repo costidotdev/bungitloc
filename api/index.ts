@@ -10,32 +10,42 @@ serve({
       const { user, repo } = req.params;
       try {
         console.log(`Trying to analyze ${user}/${repo}`);
-        await $`wget https://github.com/${user}/${repo}/archive/master.zip`
+        await $`wget https://github.com/${user}/${repo}/archive/master.zip`;
         const clocData = await $`cloc master.zip`.text();
         await rm("./master.zip", { recursive: true, force: true });
 
-        return new Response(JSON.stringify({
-          clocData,
-          repository: `${user}/${repo}`,
-        }), {
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "http://localhost:5173",
-            "Access-Control-Allow-Methods": "POST",
-            "Access-Control-Allow-Headers": "Content-Type",
+        return new Response(
+          JSON.stringify({
+            clocData,
+            repository: `${user}/${repo}`,
+          }),
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "http://localhost:5173",
+              "Access-Control-Allow-Methods": "POST",
+              "Access-Control-Allow-Headers": "Content-Type",
+            },
           }
-        });
-      } catch (error: any) {
+        );
+      } catch (error: unknown) {
         try {
           await rm("./master.zip", { force: true });
-        } catch { }
+        } catch {
+          console.error("Failed to remove master.zip");
+        }
 
-        return new Response(JSON.stringify({
-          error: `Failed to analyze ${user}/${repo}: ${error.message}`
-        }), {
-          status: 500,
-          headers: { "Content-Type": "application/json" }
-        });
+        return new Response(
+          JSON.stringify({
+            error: `Failed to analyze ${user}/${repo}: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`,
+          }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
     },
   },
