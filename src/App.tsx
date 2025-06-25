@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Header from "./components/header";
+import { ClocTable } from "./components/cloc-table";
 
 export default function App() {
   const [githubUrl, setGithubUrl] = useState("");
@@ -41,6 +41,10 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    console.log(result);
+  }, [result]);
+
   return (
     <div>
       <Header />
@@ -65,7 +69,7 @@ export default function App() {
         <Card className="max-w-xl mx-auto mt-10 p-6 space-y-4">
           <CardContent className="space-y-4">
             <Label>Results (cloc output):</Label>
-            <Textarea value={result} readOnly rows={10} />
+            <ClocTable data={JSON.parse(result)} />
           </CardContent>
         </Card>
       )}

@@ -11,7 +11,7 @@ serve({
       try {
         console.log(`Trying to analyze ${user}/${repo}`);
         await $`wget https://github.com/${user}/${repo}/archive/master.zip`;
-        const clocData = await $`cloc master.zip`.text();
+        const clocData = await $`cloc --json master.zip `.text();
         await rm("./master.zip", { recursive: true, force: true });
 
         return new Response(
@@ -26,7 +26,7 @@ serve({
               "Access-Control-Allow-Methods": "POST",
               "Access-Control-Allow-Headers": "Content-Type",
             },
-          }
+          },
         );
       } catch (error: unknown) {
         try {
@@ -44,7 +44,7 @@ serve({
           {
             status: 500,
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
       }
     },
